@@ -1,0 +1,36 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+string joinString(vector<string> vWords, string delim)
+{
+	string str = "";
+
+	for (string& s : vWords)
+		str = str + s + delim;
+
+	return str.substr(0, str.length() - delim.length());
+}
+
+string joinString(string arrWords[4], int size, string delim)
+{
+	string str = "";
+
+	for (int i = 0; i < size; i++)
+		str = str + arrWords[i] + delim;
+
+	return str.substr(0, str.length() - delim.length());
+}
+
+int main()
+{
+	vector<string> vWords = {"Mohammed", "Fadi", "Ali", "Maher"};
+	string arrWords[4] = {"Mohammed", "Fadi", "Ali", "Maher"};
+
+	cout << "Vector after Join: " << endl;
+	cout << joinString(vWords, "###") << endl;
+
+	cout << "\nArray after Join: " << endl;
+	cout << joinString(arrWords, 4, "###") << endl;
+}

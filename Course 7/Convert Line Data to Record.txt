@@ -1,0 +1,77 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+struct sClient
+{
+	string account_number;
+	string pin_code;
+	string name;
+	string phone_number;
+	double account_balance;
+};
+
+vector<string> splitString(string str, string delim)
+{
+	vector<string> vString;
+
+	short pos = 0;
+	string sWord;
+
+	while ((pos = str.find(delim)) != std::string::npos)
+	{
+		sWord = str.substr(0, pos);
+
+		if (sWord != "")
+			vString.push_back(sWord);
+
+		str.erase(0, pos + delim.length());
+	}
+
+	if (str != "")
+		vString.push_back(str);
+
+	return vString;
+}
+
+sClient convertLineToRecord(string line, string separaor = "#//#")
+{
+	sClient Client;
+	vector<string> vClientData;
+
+	vClientData = splitString(line, separaor);
+
+	Client.account_number = vClientData[0];
+	Client.pin_code = vClientData[1];
+	Client.name = vClientData[2];
+	Client.phone_number = vClientData[3];
+	Client.account_balance = stod(vClientData[4]);
+
+	return Client;
+}
+
+void printClientRecord(sClient Client)
+{
+	cout << "\n\nThe Following is The Expected Client Record\n";
+	cout << "\nAccount Number: " << Client.account_number;
+	cout << "\nPinCode: " << Client.pin_code;
+	cout << "\nName: " << Client.name;
+	cout << "\nPhone Number: " << Client.phone_number;
+	cout << "\nAccount Balance: " << Client.account_balance;
+
+}
+
+int main()
+{
+	string line = "A150#//#1234#//#Mohammed Abu-Hahoud#//#079999#//#5270.000000";
+
+	cout << "Line Record is: \n";
+	cout << line;
+
+	sClient Client = convertLineToRecord(line);
+
+	printClientRecord(Client);
+
+	return 0;
+} 

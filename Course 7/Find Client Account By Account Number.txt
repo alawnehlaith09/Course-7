@@ -1,0 +1,127 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+using namespace std;
+
+struct sClient
+{
+	string account_number;
+	string pin_code;
+	string name;
+	string phone_number;
+	double account_balance;
+};
+
+vector<string> splitString(string str, string delim)
+{
+	vector<string> vString;
+
+	short pos = 0;
+	string sWord;
+
+	while ((pos = str.find(delim)) != std::string::npos)
+	{
+		sWord = str.substr(0, pos);
+
+		if (sWord != "")
+			vString.push_back(sWord);
+
+		str.erase(0, pos + delim.length());
+	}
+
+	if (str != "")
+		vString.push_back(str);
+
+	return vString;
+}
+
+sClient convertLineToRecord(string Line, string Seperator = "#//#")
+{
+	sClient Client;
+	vector<string> vClientData;
+	vClientData = splitString(Line, Seperator);
+
+	if (vClientData.size() != 5)
+	{
+		return Client; 
+	}
+
+	Client.account_number = vClientData[0];
+	Client.pin_code = vClientData[1];
+	Client.name = vClientData[2];
+	Client.phone_number = vClientData[3];
+	Client.account_number = stod(vClientData[4]);//cast string to double
+
+	return Client;
+}
+
+
+vector<sClient> loadDataFromFileToVector(string file_name)
+{
+	vector<sClient> vClients;
+
+	fstream my_file;
+	my_file.open(file_name, ios::in);
+
+	if (my_file.is_open())
+	{
+		string line;
+		sClient client;
+
+		while (getline(my_file, line))
+		{
+			client = convertLineToRecord(line);
+			vClients.push_back(client);
+		}
+
+		my_file.close();
+	}
+
+	return vClients;
+}
+
+void PrintClientCard(sClient Client)
+{
+	cout << "\nThe following are the client details:\n";
+	cout << "\nAccout Number: " << Client.account_number;
+	cout << "\nPin Code : " << Client.pin_code;
+	cout << "\nName : " << Client.name;
+	cout << "\nPhone : " << Client.phone_number;
+	cout << "\nAccount Balance: " << Client.account_balance;
+}
+
+bool findClientByAccountNumber(string account_number, sClient& client)
+{
+	vector <sClient> vClients = loadDataFromFileToVector("MyFile.txt");
+
+	for (sClient c : vClients)
+	{
+		if (c.account_number == account_number)
+		{
+			client = c;
+			return true;
+		}
+	}
+	return false;
+}
+
+string readClientAccountNumber()
+{
+	string account_number = "";
+
+	cout << "Enter an Account Number: ";
+	cin >> account_number;
+	return account_number;
+}
+
+int main()
+{
+	sClient client;
+	string account_number = readClientAccountNumber();
+
+	if (findClientByAccountNumber(account_number, client))
+		PrintClientCard(client);
+	else
+		cout << "Client With Account Number (" << account_number << ") is Not Found!";
+}

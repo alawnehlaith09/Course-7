@@ -1,0 +1,48 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+string readString()
+{
+	string str;
+	cout << "Enter a string: ";
+	getline(cin, str);
+	return str;
+}
+
+int stringLength(string str)
+{
+	return str.length();
+}
+
+int countCapitalLetters(string str)
+{
+	int count = 0;
+
+	for (int i = 0; i < str.length(); i++)
+		if (isupper(str[i]))
+			count++;
+
+	return count;
+}
+
+int countCharacter(string str, char ch)
+{
+	int count = 0;
+
+	for (int i = 0; i < str.length(); i++)
+		if (str[i] == ch)
+			count++;
+
+	return count;
+}
+
+int main()
+{
+	string str = readString();
+	char ch;
+
+	cout << "\nEnter a character to count: ";
+	cin >> ch;
+	cout << "\nLetter '" << ch << "' Count = " << countCharacter(str, ch) << endl;
+}

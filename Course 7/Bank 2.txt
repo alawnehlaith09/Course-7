@@ -1,0 +1,720 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+const string ClientsFileName = "Clients.txt";
+
+struct sClient
+{
+    string accountNumber;
+    string pinCode;
+    string name;
+    string phoneNumber;
+    double accountBalance;
+};
+
+vector<string> split_string(string str, string delim)
+{
+    vector<string> vString;
+
+    short pos = 0;
+    string sWord;
+
+    while ((pos = str.find(delim)) != std::string::npos)
+    {
+        sWord = str.substr(0, pos);
+
+        if (sWord != "")
+            vString.push_back(sWord);
+
+        str.erase(0, pos + delim.length());
+    }
+
+    if (str != "")
+        vString.push_back(str);
+
+    return vString;
+}
+
+void print_client_card(sClient Client)
+{
+    cout << "\nThe following are the client details: " << endl;
+    cout << string(34, '-') << endl;
+    cout << "Accout Number: " << Client.accountNumber;
+    cout << "\nPin Code : " << Client.pinCode;
+    cout << "\nName : " << Client.name;
+    cout << "\nPhone : " << Client.phoneNumber;
+    cout << "\nAccount Balance: " << Client.accountBalance << endl;
+    cout << string(34, '-') << endl;
+}
+
+sClient convert_line_to_record(string line, string separaor = "#//#")
+{
+    sClient Client;
+    vector<string> vClientData;
+
+    vClientData = split_string(line, separaor);
+
+    Client.accountNumber = vClientData[0];
+    Client.pinCode = vClientData[1];
+    Client.name = vClientData[2];
+    Client.phoneNumber = vClientData[3];
+    Client.accountBalance = stod(vClientData[4]);
+
+    return Client;
+}
+
+vector<sClient> load_clients_data_from_file(string my_file)
+{
+    vector<sClient> vClients;
+    fstream MyFile;
+
+    MyFile.open(my_file, ios::in);
+
+    if (MyFile.is_open())
+    {
+        string line;
+        sClient Client;
+
+        while (getline(MyFile, line))
+        {
+            Client = convert_line_to_record(line);
+            vClients.push_back(Client);
+        }
+
+        MyFile.close();
+    }
+
+    return vClients;
+}
+
+void print_client_record(sClient Client)
+{
+    cout << "| " << setw(15) << left << Client.accountNumber;
+    cout << "| " << setw(10) << left << Client.pinCode;
+    cout << "| " << setw(40) << left << Client.name;
+    cout << "| " << setw(12) << left << Client.phoneNumber;
+    cout << "| " << setw(12) << left << Client.accountBalance;
+}
+
+void show_client_list(vector<sClient> vClients)
+{
+    cout << "\n\t\t\t\t\tClient List (" << vClients.size() << ") Client(s)";
+    cout << "\n_______________________________________________________";
+    cout << "________________________________________\n" << endl;
+
+    cout << "| " << setw(15) << left << "Account Number";
+    cout << "| " << setw(10) << left << "Pin Code";
+    cout << "| " << setw(40) << left << "Name";
+    cout << "| " << setw(12) << left << "Phone";
+    cout << "| " << setw(12) << left << "Balance";
+
+    cout << "\n_______________________________________________________";
+    cout << "________________________________________\n" << endl;
+
+    for (sClient Client : vClients)
+    {
+        print_client_record(Client);
+        cout << endl;
+    }
+
+    cout << "\n_______________________________________________________";
+    cout << "________________________________________\n" << endl;
+}
+
+string convert_record_to_line(sClient Client, string separator = "#//#")
+{
+    string client_record = "";
+
+    client_record += Client.accountNumber + separator;
+    client_record += Client.pinCode + separator;
+    client_record += Client.name + separator;
+    client_record += Client.phoneNumber + separator;
+    client_record += to_string(Client.accountBalance);
+
+    return client_record;
+}
+
+sClient read_new_client()
+{
+    sClient client;
+    vector<sClient> vClients = load_clients_data_from_file(ClientsFileName);
+    bool isExist;
+
+    do
+    {
+        isExist = false;
+        cout << "Enter Account Number: ";
+        cin >> ws;
+        getline(cin, client.accountNumber);
+
+        for (sClient& c : vClients)
+            if (c.accountNumber == client.accountNumber)
+            {
+                cout << "Client with [" << client.accountNumber << "] already exists";
+                isExist = true;
+                break;
+            }
+    } while (isExist);
+
+    cout << "Enter PinCode: ";
+    getline(cin, client.pinCode);
+
+    cout << "Enter Name: ";
+    getline(cin, client.name);
+
+    cout << "Enter Phone Number: ";
+    getline(cin, client.phoneNumber);
+
+    cout << "Enter Account Balance: ";
+    cin >> client.accountBalance;
+
+    return client;
+}
+
+void add_more();
+
+void addDataLineToFile(string my_file, string line)
+{
+    fstream MyFile;
+
+    MyFile.open(ClientsFileName, ios::out | ios::app);
+
+    if (MyFile.is_open())
+    {
+        MyFile << line << endl;
+        add_more();
+        MyFile.close();
+    }
+}
+
+void add_new_client()
+{
+    cout << string(36, '-') << endl;
+    cout << "   Add Clients Screen  " << endl;
+    cout << string(36, '-') << endl;
+    cout << "Adding New Client: " << endl << endl;
+    sClient client = read_new_client();
+    addDataLineToFile(ClientsFileName, convert_record_to_line(client));
+}
+
+void add_more()
+{
+    char add;
+
+    cout << "Client Added Successfully, do you want to add more clients? (y/n): ";
+    cin >> add;
+
+    if (tolower(add) == 'y')
+    {
+        system("cls");
+        add_new_client();
+    }
+}
+
+bool find_client_by_account_number(string accountNumber, sClient& client)
+{
+    vector<sClient> vClients = load_clients_data_from_file(ClientsFileName);
+
+    for (sClient& c : vClients)
+    {
+        if (c.accountNumber == accountNumber)
+        {
+            client = c;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void save_vector_to_file(vector<sClient>& vClients)
+{
+    fstream myFile;
+    myFile.open(ClientsFileName, ios::out);
+
+    if (myFile.is_open())
+    {
+        for (sClient c : vClients)
+            myFile << convert_record_to_line(c) << endl;
+
+        myFile.close();
+    }
+}
+
+void deletion_process(string accountNumber)
+{
+    vector<sClient> vClients = load_clients_data_from_file(ClientsFileName);
+    vector<sClient> newVec;
+
+
+    char sure = 'n';
+
+    cout << endl << "Are you sure you want to delete this client? (y/n): ";
+    cin >> sure;
+
+    if (tolower(sure) == 'y')
+    {
+        for (int i = 0; i < vClients.size(); i++)
+            if (accountNumber != vClients.at(i).accountNumber)
+                newVec.push_back(vClients.at(i));
+
+        save_vector_to_file(newVec);
+        cout << "\n\nClient Deleted Successfully...";
+    }
+}
+
+void delete_client()
+{
+    string accountNumber;
+    sClient client;
+
+    cout << string(34, '-') << endl;
+    cout << "   Delete Client Screen    " << endl;
+    cout << string(34, '-') << endl << endl;
+
+    cout << "Enter Account Number: ";
+    cin >> accountNumber;
+
+    if (find_client_by_account_number(accountNumber, client))
+    {
+        print_client_card(client);
+        deletion_process(accountNumber);
+    }
+    else
+        cout << "Client with Account Number (" << accountNumber << ") is not found!" << endl;
+
+}
+
+sClient modify_client()
+{
+    sClient Client;
+
+    cout << "Enter PinCode: ";
+    getline(cin >> ws, Client.pinCode);
+
+    cout << "Enter Name: ";
+    getline(cin, Client.name);
+
+    cout << "Enter Phone Number: ";
+    getline(cin, Client.phoneNumber);
+
+    cout << "Enter Account Balance: ";
+    cin >> Client.accountBalance;
+
+    return Client;
+}
+
+void updating_process(string accountNumber)
+{
+    vector<sClient> vClients = load_clients_data_from_file(ClientsFileName);
+    char sure = 'n';
+
+    cout << endl << "Are you sure you want to update this client? (y/n): ";
+    cin >> sure;
+
+    if (tolower(sure) == 'y')
+    {
+        for (sClient& c : vClients)
+            if (c.accountNumber == accountNumber)
+            {
+                c = modify_client();
+                c.accountNumber = accountNumber;
+                break;
+            }
+
+        save_vector_to_file(vClients);
+        cout << "\n\nClient Updated Successfully...";
+    }
+}
+
+void update_client()
+{
+    string accountNumber;
+    sClient client;
+
+    cout << string(34, '-') << endl;
+    cout << "   Update Client Screen    " << endl;
+    cout << string(34, '-') << endl << endl;
+
+    cout << "Enter Account Number: ";
+    cin >> accountNumber;
+
+    if (find_client_by_account_number(accountNumber, client))
+    {
+        print_client_card(client);
+        updating_process(accountNumber);
+    }
+    else
+        cout << "Client with Account Number (" << accountNumber << ") is not found!" << endl;
+}
+
+void find_client()
+{
+    string accountNumber;
+    sClient client;
+
+    cout << string(34, '-') << endl;
+    cout << "   Find Client Screen  " << endl;
+    cout << string(34, '-') << endl;
+
+    cout << "Enter Account Number: ";
+    cin >> accountNumber;
+
+    if (find_client_by_account_number(accountNumber, client))
+        print_client_card(client);
+    else
+        cout << "Client with (" << accountNumber << ") is not found!";
+}
+
+void exit()
+{
+    cout << string(34, '-') << endl;
+    cout << "       Program Ends :-)        " << endl;
+    cout << string(34, '-') << endl;
+}
+
+void transactions_menue_screen()
+{
+    cout << string(40, '=');
+    cout << endl << "           Transactions Menue Scree       " << endl;
+    cout << string(40, '=');
+    cout << endl << "   [1] Deposit." << endl;
+    cout << "   [2] Withdraw." << endl;
+    cout << "   [3] Total Balances." << endl;
+    cout << "   [4] Main Menue." << endl;
+    cout << string(40, '=') << endl;
+    cout << "Choose what do you want to do? [1 to 4]" << endl;
+}
+
+void choice_from_transactions();
+
+void back_to_transactions_menue()
+{
+    transactions_menue_screen();
+    choice_from_transactions();
+}
+
+void deposit_process(string accountNumber)
+{
+    vector<sClient> vClients = load_clients_data_from_file(ClientsFileName);
+    double deposit;
+    char sure;
+
+    cout << "Enter Deposit Amount: ";
+    cin >> deposit;
+
+    cout << "Are you sure you want to perform this transition? (y/n): ";
+    cin >> sure;
+
+    if (tolower(sure) == 'y')
+    {
+        for (sClient& c : vClients)
+            if (c.accountNumber == accountNumber)
+            {
+                c.accountBalance += deposit;
+                break;
+            }
+
+        save_vector_to_file(vClients);
+    }
+
+}
+
+void deposit()
+{
+    cout << string(34, '-') << endl;
+    cout << "   Deposit Screen   \n";
+    cout << string(34, '-') << endl << endl;
+
+    sClient client;
+    string accountNumber;
+
+    while (true)
+    {
+        cout << "Enter Account Number: ";
+        cin >> accountNumber;
+
+        if (find_client_by_account_number(accountNumber, client))
+        {
+            print_client_card(client);
+            deposit_process(accountNumber);
+            break;
+        }
+        else
+            cout << "Client with (" << accountNumber << ") is not found!\n\n";
+
+    }
+}
+
+void withdraw_process(string accountNumber)
+{
+    vector<sClient> vClients = load_clients_data_from_file(ClientsFileName);
+    double withdraw;
+    char sure;
+
+    while (true)
+    {
+        cout << "Enter Withdraw Amount: ";
+        cin >> withdraw;
+
+        bool clientFound = false;
+        double balance = 0;
+
+        for (sClient& c : vClients)
+        {
+            if (c.accountNumber == accountNumber)
+            {
+                clientFound = true;
+                balance = c.accountBalance;
+                break;
+            }
+        }
+
+        if (!clientFound)
+        {
+            cout << "Client not found!\n";
+            return;
+        }
+
+        if (withdraw > balance)
+        {
+            cout << "Amount Exceeds the Balance, you can withdraw up to: " << balance << "\n\n";
+            continue;
+        }
+
+        cout << "Are you sure you want to perform this transaction? (y/n): ";
+        cin >> sure;
+
+        if (tolower(sure) == 'y')
+        {
+            for (sClient& c : vClients)
+            {
+                if (c.accountNumber == accountNumber)
+                {
+                    c.accountBalance -= withdraw;
+                    break;
+                }
+            }
+
+            save_vector_to_file(vClients);
+            cout << "\nWithdraw Done Successfully.\n";
+        }
+
+        break;
+    }
+}
+
+
+void withdraw()
+{
+    cout << string(34, '-') << endl;
+    cout << "   Withdraw Screen   \n";
+    cout << string(34, '-') << endl << endl;
+
+    sClient client;
+    string accountNumber;
+
+    while (true)
+    {
+        cout << "Enter Account Number: ";
+        cin >> accountNumber;
+
+        if (find_client_by_account_number(accountNumber, client))
+        {
+            print_client_card(client);
+            withdraw_process(accountNumber);
+            break;
+        }
+        else
+            cout << "Client with (" << accountNumber << ") is not found!\n\n";
+
+    }
+}
+
+void total_balances()
+{
+    vector<sClient> vClients = load_clients_data_from_file(ClientsFileName);
+    double total = 0;
+
+    cout << "\n\t\t\t\t\tClient List (" << vClients.size() << ") Client(s)";
+    cout << "\n_______________________________________________________";
+    cout << "________________________________________\n" << endl;
+
+    cout << "| " << setw(15) << left << "Account Number";
+    cout << "| " << setw(40) << left << "Name";
+    cout << "| " << setw(12) << left << "Balance";
+
+    cout << "\n_______________________________________________________";
+    cout << "________________________________________\n" << endl;
+
+    for (sClient Client : vClients)
+    {
+        cout << "| " << setw(15) << left << Client.accountNumber;
+        cout << "| " << setw(40) << left << Client.name;
+        cout << "| " << setw(12) << left << Client.accountBalance;
+        cout << endl;
+
+        total += Client.accountBalance;
+    }
+
+    cout << "\n_______________________________________________________";
+    cout << "________________________________________\n" << endl;
+
+    cout << setw(60) << right << "Total Balances = " << total << endl;
+}
+
+
+void choice();
+void main_menue_screen();
+
+void choice_from_transactions()
+{
+    int c;
+    cin >> c;
+
+    switch (c)
+    {
+    case 1:
+    {
+        system("cls");
+        deposit();
+        system("cls");
+        back_to_transactions_menue();
+        break;
+    }
+
+    case 2:
+    {
+        system("cls");
+        withdraw();
+        system("cls");
+        back_to_transactions_menue();
+        break;
+    }
+
+    case 3:
+    {
+        system("cls");
+        total_balances();
+        cout << "\n\nPress any key to go back to transactions menu...";
+        system("pause>0");
+        system("cls");
+        back_to_transactions_menue();
+        break;
+    }
+
+    case 4:
+    {
+        system("cls");
+        main_menue_screen();
+        choice();
+        break;
+    }
+
+
+
+    }
+}
+
+void main_menue_screen()
+{
+    cout << string(40, '=');
+    cout << endl << "       Main Menue Screen       " << endl;
+    cout << string(40, '=');
+    cout << endl << "   [1] Show Client List." << endl;
+    cout << "   [2] Add New Client." << endl;
+    cout << "   [3] Delete Client." << endl;
+    cout << "   [4] Update Client Info." << endl;
+    cout << "   [5] Find Client." << endl;
+    cout << "   [6] Transitions" << endl;
+    cout << "   [7] Exit." << endl;
+    cout << string(40, '=') << endl;
+    cout << "Choose what do you want to do? [1 to 7]" << endl;
+}
+
+void back_to_main_menue()
+{
+    cout << "\n\nPress any key to go back to main menue...";
+    system("pause>0");
+    system("cls");
+    main_menue_screen();
+    choice();
+}
+
+
+void choice()
+{
+    int c;
+    cin >> c;
+
+    switch (c)
+    {
+    case 1:
+    {
+        vector<sClient> vClients = load_clients_data_from_file(ClientsFileName);
+        system("cls");
+        show_client_list(vClients);
+        back_to_main_menue();
+        break;
+    }
+
+    case 2:
+    {
+        system("cls");
+        add_new_client();
+        back_to_main_menue();
+        break;
+    }
+
+    case 3:
+    {
+        system("cls");
+        delete_client();
+        back_to_main_menue();
+        break;
+    }
+
+    case 4:
+    {
+        system("cls");
+        update_client();
+        back_to_main_menue();
+        break;
+    }
+
+    case 5:
+    {
+        system("cls");
+        find_client();
+        back_to_main_menue();
+        break;
+    }
+
+    case 6:
+    {
+        system("cls");
+        transactions_menue_screen();
+        choice_from_transactions();
+        break;
+    }
+
+    case 7:
+    {
+        system("cls");
+        exit();
+        break;
+    }
+
+    }
+}
+
+int main()
+{
+    main_menue_screen();
+    choice();
+}

@@ -1,0 +1,46 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+string readString()
+{
+	string str;
+	cout << "Enter a string: ";
+	getline(cin, str);
+	return str;
+}
+
+char invertCharacterCase(char ch)
+{
+	return isupper(ch) ? tolower(ch) : toupper(ch);
+}
+
+int countLetter(string str, char ch, bool match_case = true)
+{
+	int count = 0;
+
+	for (int i = 0; i < str.length(); i++)
+		if (match_case)
+		{
+			if (str[i] == ch)
+				count++;
+		}
+		else
+			if (tolower(str[i]) == tolower(ch))
+				count++;
+
+	return count;
+}
+
+
+int main()
+{
+	string str = readString();
+	char ch;
+
+	cout << "\nEnter a character to count: ";
+	cin >> ch;
+	cout << "\nLetter '" << ch << "' Count = " << countLetter(str, ch) << endl;
+
+	cout << "\nLetter '" << ch << "' Or '" << invertCharacterCase(ch) << "' Count = " << countLetter(str, ch, false) << endl;
+}

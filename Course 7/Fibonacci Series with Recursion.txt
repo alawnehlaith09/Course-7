@@ -1,0 +1,22 @@
+#include <iostream>
+using namespace std;
+
+void printFibonacciSeriesUsingRecursion(int number, int prev1, int prev2)
+{
+	int febonacci_number = 0;
+	
+	if (number > 0)
+	{
+		febonacci_number = prev1 + prev2;
+		prev2 = prev1;
+		prev1 = febonacci_number;
+		cout << febonacci_number << "	";
+		printFibonacciSeriesUsingRecursion(number - 1, prev1, prev2);
+	}
+}
+
+int main()
+{
+	printFibonacciSeriesUsingRecursion(10, 0, 1);
+	cout << endl;
+}

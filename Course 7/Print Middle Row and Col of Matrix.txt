@@ -1,0 +1,64 @@
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int randomNumber(int from, int to)
+{
+	int random_number = rand() & (to - from + 1) + from;
+	return random_number;
+}
+
+void fillArrayWithRandomNumbers(int arr[3][3], int rows, int cols)
+{
+	for (int i = 0; i < rows; i++)
+		for (int j = 0; j < cols; j++)
+			arr[i][j] = randomNumber(1, 10);
+}
+
+void printMiddleRow(int arr[3][3], int rows, int cols)
+{
+	int middle_row = rows / 2;
+
+	for (int j = 0; j < cols; j++)
+		cout << setw(2) << setfill('0') << arr[middle_row][j] << "	";
+}
+
+void printMiddleCol(int arr[3][3], int rows, int cols)
+{
+	int middle_col = cols / 2;
+
+	for (int i = 0; i < 3; i++)
+		cout << setw(2) << setfill('0') << arr[i][middle_col] << "	";
+}
+
+void printArray(int arr[3][3], int rows, int cols)
+{
+	for (int i = 0; i < rows; i++)
+	{
+		if (!(i == 0))
+			cout << endl;
+
+		for (int j = 0; j < cols; j++)
+			cout << setw(2) << setfill('0') << arr[i][j] << "	";
+	}
+}
+
+int main()
+{
+	srand((unsigned)time(NULL));
+
+	int arr[3][3];
+
+	fillArrayWithRandomNumbers(arr, 3, 3);
+	cout << "Matrix: " << endl;
+	printArray(arr, 3, 3);
+	cout << endl << endl;
+
+	cout << "Middle Row of Matrix: " << endl;
+	printMiddleRow(arr, 3, 3);
+	cout << endl << endl;
+
+	cout << "Middle Col of Matrix: " << endl;
+	printMiddleCol(arr, 3, 3);
+	cout << endl << endl;
+}

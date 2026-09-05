@@ -1,0 +1,98 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+string readString()
+{
+	string str;
+	cout << "Enter a string: ";
+	getline(cin, str);
+	return str;
+}
+
+vector<string> splitString(string str, string delim)
+{
+	vector<string> vWords;
+
+	int position = 0;
+	string word = "";
+
+	while ((position = str.find(delim)) != std::string::npos)
+	{
+		word = str.substr(0, position);
+
+		if (word != "")
+			vWords.push_back(word);
+
+
+		str.erase(0, position + delim.length());
+	}
+
+	if (str != "")
+		vWords.push_back(str);
+
+	return vWords;
+}
+
+string joinString(vector<string> vWords, string delim)
+{
+	string str = "";
+
+	for (string& s : vWords)
+		str = str + s + delim;
+
+	return str.substr(0, str.length() - delim.length());
+}
+
+string lowerAllWords(string str)
+{
+	for (int i = 0; i < str.length(); i++)
+		str[i] = tolower(str[i]);
+
+	return str;
+}
+
+string replaceWords(string str, string to_replace, string replace_to, bool match_case = true)
+{
+	vector<string> vString = splitString(str, " ");
+
+	for (string& s : vString)
+	{
+		if (match_case) 
+		{
+			if (s == to_replace)
+			{
+				s = replace_to;
+			}
+		}
+		else
+		{
+			if (lowerAllWords(s) == lowerAllWords(to_replace))
+			{
+				s = replace_to;
+			}
+		}
+	}
+
+	return joinString(vString, " ");
+}
+
+int main()
+{
+	string str = readString();
+	string to_replace;
+	string replace_to;
+
+	cout << "Enter a string to replace from: ";
+	cin >> to_replace;
+
+	cout << "Enter a string to replace to: ";
+	cin >> replace_to;
+
+
+	cout << "\nOrignal String: \n" << str << endl;
+	cout << "\nString after Replacing (Match Case): \n" << replaceWords(str, to_replace, replace_to) << endl;
+	cout << "\nString after Replacing (Don't Match Case): \n" << replaceWords(str, to_replace, replace_to, false) << endl;
+
+}

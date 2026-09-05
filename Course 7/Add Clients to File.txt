@@ -1,0 +1,89 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+using namespace std;
+
+struct sClient
+{
+	string account_number;
+	string pin_code;
+	string name;
+	string phone_number;
+	double account_balance;
+};
+
+sClient readNewClient()
+{
+	sClient Client;
+
+	cout << "Enter Account Number: ";
+	getline(cin >> ws, Client.account_number);
+
+	cout << "Enter PinCode: ";
+	getline(cin, Client.pin_code);
+
+	cout << "Enter Name: ";
+	getline(cin, Client.name);
+
+	cout << "Enter Phone Number: ";
+	getline(cin, Client.phone_number);
+
+	cout << "Enter Account Balance: ";
+	cin >> Client.account_balance;
+
+	return Client;
+}
+
+string convertRecordToLine(sClient Client, string separator = "#//#")
+{
+	string client_record = "";
+
+	client_record += Client.account_number + separator;
+	client_record += Client.pin_code + separator;
+	client_record += Client.name + separator;
+	client_record += Client.phone_number + separator;
+	client_record += to_string(Client.account_balance);
+
+	return client_record;
+}
+
+void addDataLineToFile(string my_file, string line)
+{
+	fstream MyFile;
+
+	MyFile.open(my_file, ios::out | ios::app);
+
+	if (MyFile.is_open())
+	{
+		MyFile << line << endl;
+
+		MyFile.close();
+	}
+}
+
+void addNewClient()
+{
+	sClient Client;
+	Client = readNewClient();
+	addDataLineToFile("MyFile.txt", convertRecordToLine(Client));
+}
+
+void addClients()
+{
+	char add_more = 'Y';
+
+	do
+	{
+		system("cls");
+		cout << "Adding New Client \n\n";
+
+		addNewClient();
+		cout << "Client added successfully, do you want to add more client? (Y,N): ";
+		cin >> add_more;
+	} while (add_more == 'y' || add_more == 'Y');
+}
+
+int main()
+{
+	addClients();
+}

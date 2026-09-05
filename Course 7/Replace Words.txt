@@ -1,0 +1,43 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+string readString()
+{
+	string str;
+	cout << "Enter a string: ";
+	getline(cin, str);
+	return str;
+}
+
+
+string replaceWords(string str, string to_replace, string replace_to)
+{
+	int pos = str.find(to_replace);
+
+	while (pos != std::string::npos)
+	{
+		str = str.replace(pos, to_replace.length(), replace_to);
+		pos = str.find(to_replace);
+	}
+	
+	return str;
+}
+
+int main()
+{
+	string str = readString();
+	string to_replace;
+	string replace_to;
+
+	cout << "Enter a string to replace from: ";
+	cin >> to_replace;
+
+	cout << "Enter a string to replace to: ";
+	cin >> replace_to;
+
+	
+	cout << "Orignal String: \n" << str << endl;
+	cout << "\nString after Replacing: \n" << replaceWords(str, to_replace, replace_to) << endl;
+}
